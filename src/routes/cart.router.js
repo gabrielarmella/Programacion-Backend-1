@@ -1,10 +1,11 @@
 import { Router } from "express";
-import CartManager from "../managers/cartManager.js";
+import CartManager from "../managers/CartManager.js";
 
 
 const router = Router();
-const cartManager = new CartManager;
+const cartManager = new CartManager();
 
+// Ruta para obtener los carritos
 router.get("/", async (req, res) => {
     try {
         const carts = await cartManager.getAll(req.query);
@@ -14,6 +15,7 @@ router.get("/", async (req, res) => {
     }
 });
 
+// Ruta para obtener un carrito en específico por su ID
 router.get("/:id", async (req, res) => {
     try {
         const cart = await cartManager.getOneById(req.params.id);
@@ -23,6 +25,7 @@ router.get("/:id", async (req, res) => {
     }
 });
 
+// Ruta para crear una receta
 router.post("/", async (req, res) => {
     try {
         const cart = await cartManager.insertOne(req.body);
@@ -32,11 +35,12 @@ router.post("/", async (req, res) => {
     }
 });
 
-router.post("/:cid/ingredients/:pid", async (req, res) => {
+// Ruta para incrementar en una unidad o agregar un producte específico en una receta por su ID
+router.post("/:cid/products/:pid", async (req, res) => {
     try {
         const { cid, pid } = req.params;
         const { quantity } = req.body;
-        const cart = await cartManager.addOneIngredient(cid, pid, quantity || 1);
+        const cart = await cartManager.addOneProduct(cid, pid, quantity || 1);
         res.status(200).json({ status: "success", payload: cart });
     } catch (error) {
         res.status(error.code || 500).json({ status: "error", message: error.message });
