@@ -35,7 +35,7 @@ router.post("/", uploader.single("file"), async (req, res) => {
     }
 });
 
-// Ruta para actualizar un producte por su ID, permite la subida de imágenes
+// Ruta para actualizar un producto por su ID, permite la subida de imágenes
 router.put("/:id", uploader.single("file"), async (req, res) => {
     try {
         const product = await productManager.updateOneById(req.params.id, req.body, req.file);
@@ -45,7 +45,7 @@ router.put("/:id", uploader.single("file"), async (req, res) => {
     }
 });
 
-// Ruta para eliminar un producte por su ID
+// Ruta para eliminar un producto por su ID
 router.delete("/:id", async (req, res) => {
     try {
         await productManager.deleteOneById(req.params.id);

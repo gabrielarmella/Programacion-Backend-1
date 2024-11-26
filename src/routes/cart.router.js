@@ -25,7 +25,7 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-// Ruta para crear una receta
+// Ruta para crear un carrito
 router.post("/", async (req, res) => {
     try {
         const cart = await cartManager.insertOne(req.body);
@@ -35,7 +35,7 @@ router.post("/", async (req, res) => {
     }
 });
 
-// Ruta para incrementar en una unidad o agregar un producte específico en una receta por su ID
+// Ruta para incrementar en una unidad o agregar un producto específico en una receta por su ID
 router.post("/:cid/products/:pid", async (req, res) => {
     try {
         const { cid, pid } = req.params;

@@ -19,5 +19,12 @@
 		"status": true,
 		"stock": 150,
 		"thumbnail": "file_9081_12112024_160504.jpeg"
+	},
+	{
+		"id": 4,
+		"title": "Producto de prueba 4",
+		"status": true,
+		"stock": 222,
+		"thumbnail": null
 	}
 ]

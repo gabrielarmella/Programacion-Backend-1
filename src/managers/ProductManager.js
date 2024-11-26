@@ -24,7 +24,7 @@ export default class ProductManager {
         return productFound;
     }
 
-    // Obtiene una lista de productes
+    // Obtiene una lista de productos
     async getAll() {
         try {
             this.#products = await readJsonFile(paths.files, this.#jsonFilename);
@@ -34,7 +34,7 @@ export default class ProductManager {
         }
     }
 
-    // Obtiene un producte específico por su ID
+    // Obtiene un producto específico por su ID
     async getOneById(id) {
         try {
             const productFound = await this.#findOneById(id);
@@ -53,16 +53,12 @@ export default class ProductManager {
                 throw new ErrorManager("Faltan datos obligatorios", 400);
             }
 
-            if (!file?.filename) {
-                throw new ErrorManager("Falta el archivo de la imagen", 400);
-            }
-
             const product = {
                 id: generateId(await this.getAll()),
                 title,
                 status: convertToBoolean(status),
                 stock: Number(stock),
-                thumbnail: file?.filename,
+                thumbnail: file?.filename ?? null,
             };
 
             this.#products.push(product);
