@@ -1,4 +1,5 @@
 import express from "express";
+import { connectDB } from "./config/mongoose.config.js";
 import { config as configHandlebars } from "./config/handlebars.config.js";
 import { config as configWebsocket } from "./config/websocket.config.js";
 //Importacion de enrutadores
@@ -11,6 +12,10 @@ const app = express();
 
 // Se define el puerto en el que el servidor escuchará las solicitudes
 const PORT = 8080;
+
+// Conexión con la Base de Datos del Cloud de MongoDB
+connectDB();
+
 
 app.use("/api/public", express.static("./src/public"));
 
@@ -28,11 +33,6 @@ configHandlebars(app);
 app.use("/api/carts", routerCarts);
 app.use("/api/products", routerProducts);
 app.use("/", routerViewHome);
-
-// Control de rutas inexistentes
-app.use("*", (req, res) => {
-    res.status(404).render("error404", { title: "Error 404" });
-});
 
 // Se levanta el servidor oyendo en el puerto definido
 const httpServer = app.listen(PORT, () => {

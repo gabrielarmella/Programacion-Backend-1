@@ -1,36 +1,53 @@
-import paths from "../utils/paths.js";
-import { readJsonFile, writeJsonFile, deleteFile } from "../utils/fileHandler.js";
-import { generateId } from "../utils/collectionHandler.js";
-import {convertToBoolean} from "../utils/converter.js"
 import ErrorManager from "./ErrorManager.js";
+import { isValidID } from "../config/mongoose.config.js";
+import ProductModel from "../models/product.model.js";
+import {convertToBoolean} from "../utils/converter.js"
 
 export default class ProductManager {
-    #jsonFilename;
-    #products;
+    #productModel;
 
     constructor() {
-        this.#jsonFilename = "products.json";
-    }
+        this.#productModel = ProductModel;
+    } 
 
     // Busca un producte por su ID
     async #findOneById(id) {
-        this.#products = await this.getAll();
-        const productFound = this.#products.find((item) => item.id === Number(id));
+        if (!isValidID(id)) {
+            throw new ErrorManager("ID inválido", 400);
+        }
 
-        if (!productFound) {
+        const product = await this.#productModel.findById(id);
+
+        if (!product) {
             throw new ErrorManager("ID no encontrado", 404);
         }
 
-        return productFound;
+        return product;
     }
 
     // Obtiene una lista de productos
-    async getAll() {
+    async getAll(params){
         try {
-            this.#products = await readJsonFile(paths.files, this.#jsonFilename);
-            return this.#products;
+            const $and = [];
+
+            if (params?.title) $and.push({ title: { $regex: params.title, $options: "i" } });
+            const filters = $and.length > 0 ? { $and } : {};
+
+            const sort = {
+                asc: { title: 1 },
+                desc: { title: -1 },
+            };
+
+            const paginationOptions = {
+                limit: params?.limit || 10, 
+                page: params?.page || 1, 
+                sort: sort[params?.sort] ?? {}, 
+                lean: true, 
+            };
+
+            return await this.#productModel.paginate(filters, paginationOptions);
         } catch (error) {
-            throw new ErrorManager(error.message, error.code);
+            throw ErrorManager.handleError(error);
         }
     }
 
@@ -47,76 +64,45 @@ export default class ProductManager {
     // Inserta un producte
     async insertOne(data, file) {
         try {
-            const { title, status, stock } = data;
-
-            if (!title || !status || !stock ) {
-                throw new ErrorManager("Faltan datos obligatorios", 400);
-            }
-
-            const product = {
-                id: generateId(await this.getAll()),
-                title,
-                status: convertToBoolean(status),
-                stock: Number(stock),
-                thumbnail: file?.filename ?? null,
-            };
-
-            this.#products.push(product);
-            await writeJsonFile(paths.files, this.#jsonFilename, this.#products);
+            const product = await this.#productModel.create({
+                ...data,
+                status: convertToBoolean(data.status),
+            });
 
             return product;
         } catch (error) {
-            if (file?.filename) await deleteFile(paths.images, file.filename); // Elimina la imagen si ocurre un error
-            throw new ErrorManager(error.message, error.code);
+            throw ErrorManager.handleError(error);
         }
+
     }
 
     // Actualiza un producto en específico
-    async updateOneById(id, data, file) {
+    async updateOneById(id, data) {
         try {
-            const { title, status, stock } = data;
-            const productFound = await this.#findOneById(id);
-            const newThumbnail = file?.filename;
-
-            const product = {
-                id: productFound.id,
-                title: title || productFound.title,
-                status: status ? convertToBoolean(status) : productFound.status,
-                stock: stock ? Number(stock) : productFound.stock,
-                thumbnail: newThumbnail || productFound.thumbnail,
+            const product = await this.#findOneById(id);
+            const newValues = {
+                ...product,
+                ...data,
+                status: data.status ? convertToBoolean(data.status) : product.status,
             };
 
-            const index = this.#products.findIndex((item) => item.id === Number(id));
-            this.#products[index] = product;
-            await writeJsonFile(paths.files, this.#jsonFilename, this.#products);
-
-            // Elimina la imagen anterior si es distinta de la nueva
-            if (file?.filename && newThumbnail !== productFound.thumbnail) {
-                await deleteFile(paths.images, productFound.thumbnail);
-            }
+            product.set(newValues);
+            product.save();
 
             return product;
         } catch (error) {
-            if (file?.filename) await deleteFile(paths.images, file.filename); // Elimina la imagen si ocurre un error
-            throw new ErrorManager(error.message, error.code);
+            throw ErrorManager.handleError(error);
         }
     }
 
-    // Elimina un producto en específico
-    async deleteOneById (id) {
+
+    // Elimina un producte en específico
+    async deleteOneById(id) {
         try {
-            const productFound = await this.#findOneById(id);
-
-            // Si tiene thumbnail definido, entonces, elimina la imagen del producto
-            if (productFound.thumbnail) {
-                await deleteFile(paths.images, productFound.thumbnail);
-            }
-
-            const index = this.#products.findIndex((item) => item.id === Number(id));
-            this.#products.splice(index, 1);
-            await writeJsonFile(paths.files, this.#jsonFilename, this.#products);
+            const product = await this.#findOneById(id);
+            await product.deleteOne();
         } catch (error) {
-            throw new ErrorManager(error.message, error.code);
+            throw ErrorManager.handleError(error);
         }
     }
 }

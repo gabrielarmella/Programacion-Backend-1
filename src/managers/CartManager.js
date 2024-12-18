@@ -1,66 +1,61 @@
-import paths from "../utils/paths.js";
-import { readJsonFile, writeJsonFile } from "../utils/fileHandler.js";
-import { generateId } from "../utils/collectionHandler.js";
 import ErrorManager from "./ErrorManager.js";
+import { isValidID } from "../config/mongoose.config.js";
+import CartModel from "../models/cart.model.js";
+
 
 export default class CartManager {
-    #jsonFilename;
-    #carts;
+    #cartModel;
 
     constructor() {
-        this.#jsonFilename = "carts.json";
+        this.#cartModel = CartModel;
     }
 
     // Busca un carrito por su ID
     async #findOneById(id) {
-        this.#carts = await this.getAll();
-        const cartFound = this.#carts.find((item) => item.id === Number(id));
+        if (!isValidID(id)){
+            throw new ErrorManager("ID inválido", 400);
+        }
+        const cart = await this.#cartModel.findById(id).populate("products.product");
 
-        if (!cartFound) {
+        if (!cart) {
             throw new ErrorManager("ID no encontrado", 404);
         }
 
-        return cartFound;
+        return cart;
     }
 
     // Obtiene una lista de carrito
-    async getAll() {
+    async getAll(params) {
         try {
-            this.#carts = await readJsonFile(paths.files, this.#jsonFilename);
-            return this.#carts;
+            const paginationOptions = {
+                limit: params?.limit || 10, // Número de documentos por página (por defecto 10)
+                page: params?.page || 1, // Página actual (por defecto 1)
+                populate: "products.product", // Poblar el campo virtual 'products'
+                lean: true, // Convertir los resultados en objetos planos
+            };
+
+            return await this.#cartModel.paginate({}, paginationOptions);
         } catch (error) {
-            throw new ErrorManager(error.message, error.code);
+            throw ErrorManager.handleError(error);
         }
     }
 
     // Obtiene un Carrito específico por su ID
     async getOneById(id) {
         try {
-            const cartFound = await this.#findOneById(id);
-            return cartFound;
+            return await this.#findOneById(id);
         } catch (error) {
-            throw new ErrorManager(error.message, error.code);
+            throw ErrorManager.handleError(error);
         }
     }
 
     // Inserta un Carrito
     async insertOne(data) {
         try {
-            const products = data?.products?.map((item) => {
-                return { product: Number(item.product), quantity: 1 };
-            });
-
-            const cart = {
-                id: generateId(await this.getAll()),
-                products: products ?? [],
-            };
-
-            this.#carts.push(cart);
-            await writeJsonFile(paths.files, this.#jsonFilename, this.#carts);
-
+            const cart = await this.#cartModel.create(data);
             return cart;
         } catch (error) {
-            throw new ErrorManager(error.message, error.code);
+            throw ErrorManager.handleError(error);
         }
     }
 
@@ -68,22 +63,20 @@ export default class CartManager {
     // Agrega un producto a un carrito o incrementa la cantidad de un producto existente
     addOneProduct = async (id, productId) => {
         try {
-            const cartFound = await this.#findOneById(id);
-            const productIndex = cartFound.products.findIndex((item) => item.product === Number(productId));
+            const cart = await this.#findOneById(id);
+            const productIndex = cart.products.findIndex((item) => item.product._id.toString() === productId);
 
             if (productIndex >= 0) {
-                cartFound.products[productIndex].quantity++;
+                cart.products[productIndex].quantity++;
             } else {
-                cartFound.products.push({ product: Number(productId), quantity: 1 });
+                cart.products.push({ product: productId, quantity: 1 });
             }
 
-            const index = this.#carts.findIndex((item) => item.id === Number(id));
-            this.#carts[index] = cartFound;
-            await writeJsonFile(paths.files, this.#jsonFilename, this.#carts);
+            await cart.save();
 
-            return cartFound;
+            return cart;
         } catch (error) {
             throw new ErrorManager(error.message, error.code);
         }
-    };
+    }
 }
