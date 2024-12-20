@@ -50,7 +50,7 @@ export default class CartManager {
     }
 
     // Inserta un Carrito
-    async insertOne(data) {
+    async insertOneCart(data) {
         try {
             const cart = await this.#cartModel.create(data);
             return cart;
@@ -61,7 +61,7 @@ export default class CartManager {
 
 
     // Agrega un producto a un carrito o incrementa la cantidad de un producto existente
-    addOneProduct = async (id, productId) => {
+    addOneProductToCart = async (id, productId) => {
         try {
             const cart = await this.#findOneById(id);
             const productIndex = cart.products.findIndex((item) => item.product._id.toString() === productId);
@@ -79,4 +79,60 @@ export default class CartManager {
             throw new ErrorManager(error.message, error.code);
         }
     }
+    
+    // Elimina un producto específico de un carrito
+async removeOneProduct(id, productId) {
+    try {
+        const cart = await this.#findOneById(id);
+        cart.products = cart.products.filter((item) => item.product._id.toString() !== productId);
+        await cart.save();
+        return cart;
+    } catch (error) {
+        throw new ErrorManager(error.message, error.code);
+    }
 }
+
+// Actualiza un carrito con un arreglo de productos
+async updateCart(id, products) {
+    try {
+        const cart = await this.#findOneById(id);
+        cart.products = products;
+        await cart.save();
+        return cart;
+    } catch (error) {
+        throw new ErrorManager(error.message, error.code);
+    }
+}
+
+// Actualiza la cantidad de un producto específico en un carrito
+async updateProductQuantity(id, productId, quantity) {
+    try {
+        const cart = await this.#findOneById(id);
+        const productIndex = cart.products.findIndex((item) => item.product._id.toString() === productId);
+
+        if (productIndex >= 0) {
+            cart.products[productIndex].quantity = quantity;
+        } else {
+            throw new ErrorManager("Producto no encontrado en el carrito", 404);
+        }
+
+        await cart.save();
+        return cart;
+    } catch (error) {
+        throw new ErrorManager(error.message, error.code);
+    }
+}
+
+// Elimina todos los productos de un carrito
+async clearCart(id) {
+    try {
+        const cart = await this.#findOneById(id);
+        cart.products = [];
+        await cart.save();
+        return cart;
+    } catch (error) {
+        throw new ErrorManager(error.message, error.code);
+    }
+}
+}
+

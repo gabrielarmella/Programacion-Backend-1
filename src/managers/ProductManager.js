@@ -28,26 +28,28 @@ export default class ProductManager {
     // Obtiene una lista de productos
     async getAll(params){
         try {
-            const $and = [];
-
-            if (params?.title) $and.push({ title: { $regex: params.title, $options: "i" } });
-            const filters = $and.length > 0 ? { $and } : {};
-
-            const sort = {
-                asc: { title: 1 },
-                desc: { title: -1 },
-            };
-
+            const filters = {};
+            
+            if (params?.category) {
+                filters.category = params.category;
+            }
+            
+            if (params?.search) {
+                filters.$or = [
+                    { title: { $regex: params.search, $options: 'i' }},
+                    { description: { $regex: params.search, $options: 'i' }}
+                ];
+            }
             const paginationOptions = {
-                limit: params?.limit || 10, 
                 page: params?.page || 1, 
-                sort: sort[params?.sort] ?? {}, 
+                limit: params?.limit || 10, 
+                sort: params?.sort ? { [params.sort]: params?.order === 'desc' ? -1 : 1 } : { createdAt: -1 },
                 lean: true, 
             };
 
             return await this.#productModel.paginate(filters, paginationOptions);
         } catch (error) {
-            throw ErrorManager.handleError(error);
+            throw new ErrorManager(`Error al obtener productos: ${error.message}`, 500);
         }
     }
 
@@ -61,8 +63,8 @@ export default class ProductManager {
         }
     }
 
-    // Inserta un producte
-    async insertOne(data, file) {
+    // Inserta un producto
+    async insertOne(data) {
         try {
             const product = await this.#productModel.create({
                 ...data,
@@ -104,5 +106,15 @@ export default class ProductManager {
         } catch (error) {
             throw ErrorManager.handleError(error);
         }
+    }
+
+    async getProducts() {
+        // Aquí deberías implementar la lógica para obtener los productos de la base de datos
+        // Por ejemplo:
+        // return await ProductModel.find();
+        return [
+            { id: 1, name: 'Producto 1', price: 100 },
+            { id: 2, name: 'Producto 2', price: 200 },
+        ];
     }
 }

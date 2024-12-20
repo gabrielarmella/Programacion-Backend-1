@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - Productos</title>
+    <link rel="stylesheet" href="/api/public/css/main.css">
+</head>
+<body>
+    <h1>Productos Retro⚡Electronica</h1>
+    <div id="products">
+        <ul id="products-list"></ul>
+        {{#each products}}
+        <div class="product">
+            <h2><a href="/products/{{this._id}}">{{this.title}}</a></h2>
+            <p>{{this.description}}</p>
+            <p>Precio: {{this.price}}</p>
+            <p>Categoría: {{this.category}}</p>
+            <form action="/carts/{{id}}/products/{{this._id}}" method="POST">
+                <button type="submit">Agregar al carrito</button>
+            </form>
+        </div>
+        {{/each}}
+    </div>
+    <h2>Agregar nuevo producto</h2>
+    <form id="productForm" enctype="multipart/form-data">
+        <input type="text" name="title" placeholder="Título" required>
+        <input type="text" name="description" placeholder="Descripción" required>
+        <input type="number" name="price" placeholder="Precio" required>
+        <input type="file" name="thumbnail" placeholder="Imagen" required>
+        <input type="text" name="code" placeholder="Código" required>
+        <input type="number" name="stock" placeholder="Stock" required>
+        <input type="text" name="category" placeholder="Categoría" required>
+        <button type="submit">Agregar Producto</button>
+    </form>
+    <button id="btn-refresh-products-list">Recargar Lista</button>
+
+    <div>
+        {{#if hasPrevPage}}
+        <a href= "?page={{ant-pag}}" id="antPagBtn">Anterior</a>
+        {{/if}}
+        {{#if hasNextPage}}
+        <a href= "?page={{sig-pag}}" id="sigPagBtn">Siguiente</a>
+        {{/if}}
+    </div>
+<script src="/api/public/js/addProduct.js"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Producto</title>
+    <link rel="stylesheet" href="/api/public/css/main.css">
+</head>
+<body>
+    <div class="products-container">
+        {{#each products}}
+        <div class="product-card">
+            <h3>{{product.title}}</h3>
+            <img src="{{this.thumbnail}}" alt="{{this.title}}">
+            <p>{{product.description}}</p>
+            <p>Precio: {{product.price}}</p>
+            <p>Categoría: {{product.category}}</p>
+            <p>Stock: {{this.stock}}</p>
+            <form action="/api/carts/{{id}}/products/{{product._id}}" method="POST">
+                <button onclick="addToCart('{{this._id}}')" class="add-to-cart">Agregar al carrito</button>
+            </form>
+        </div>
+        {{/each}}
+    </div>
+    <a href="/products">Volver a la lista de productos</a>
+<div class="pagination">
+    {{#if hasPrevPage}}
+        <a href="?page=1" class="page-link"><<</a>
+        <a href="?page={{prevPage}}" class="page-link"><</a>
+    {{/if}}
+    
+    <span class="current-page">Página {{currentPage}} de {{totalPages}}</span>
+    
+    {{#if hasNextPage}}
+        <a href="?page={{nextPage}}" class="page-link">></a>
+        <a href="?page={{totalPages}}" class="page-link">>></a>
+    {{/if}}
+</div>
+<script src="/api/public/js/products.js"></script> 
+</body>
+</html>

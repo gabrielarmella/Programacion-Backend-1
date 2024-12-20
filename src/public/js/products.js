@@ -1,22 +1,23 @@
-const productsList = document.getElementById("products-list");
-const btnRefreshProductsList = document.getElementById("btn-refresh-products-list");
+document.addEventListener('DOMContentLoaded', () => {
+    const productsList = document.getElementById('products-list');
+    const btnRefresh = document.getElementById('btn-refresh-products-list');
 
-const loadProductsList = async () => {
-    const response = await fetch("/api/products", { method: "GET" });
-    const data = await response.json();
-    const products = data.payload;
+    const fetchProducts = async () => {
+        try {
+            const response = await fetch('/api/products');
+            const products = await response.json();
+            productsList.innerHTML = '';
+            products.forEach(product => {
+                const li = document.createElement('li');
+                li.textContent = `${product.name} - $${product.price}`;
+                productsList.appendChild(li);
+            });
+        } catch (error) {
+            console.error('Error al obtener los productos:', error);
+        }
+    };
 
-    productsList.innerText = "";
+    btnRefresh.addEventListener('click', fetchProducts);
 
-    products.forEach((product) => {
-        productsList.innerHTML += `<li>Id: ${product.id} - Nombre: ${product.title}</li>`;
-    });
-};
-
-btnRefreshProductsList.addEventListener("click", () => {
-    loadProductsList();
-    console.log("¡Lista recargada!");
+    fetchProducts();
 });
-
-// Se ejecuta para cargar la lista de products al ingresar o refrescar
-loadProductsList();
