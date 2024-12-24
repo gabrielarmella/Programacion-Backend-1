@@ -1,23 +1,20 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const productsList = document.getElementById('products-list');
-    const btnRefresh = document.getElementById('btn-refresh-products-list');
+const productsList = document.getElementById("products-list");
+const btnRefreshProductsList = document.getElementById("btn-refresh-products-list");
 
-    const fetchProducts = async () => {
-        try {
-            const response = await fetch('/api/products');
-            const products = await response.json();
-            productsList.innerHTML = '';
-            products.forEach(product => {
-                const li = document.createElement('li');
-                li.textContent = `${product.name} - $${product.price}`;
-                productsList.appendChild(li);
-            });
-        } catch (error) {
-            console.error('Error al obtener los productos:', error);
-        }
-    };
+const loadProductsList = async () => {
+        const response = await fetch("/api/products", { method: "GET" });
+        const data = await response.json();
+        const products = data.payload.docs ?? [];
 
-    btnRefresh.addEventListener('click', fetchProducts);
+        productsList.innerText = "";
+    
+        products.forEach((product) => {
+            productsList.innerHTML += `<li>Id: ${product._id} - Nombre: ${product.title}</li>`;
+        });
+};
 
-    fetchProducts();
+btnRefreshProductsList.addEventListener("click", () => {
+    loadProductsList();
+    console.log("¡Lista recargada!");
 });
+loadProductsList();

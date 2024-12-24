@@ -21,7 +21,7 @@ export const writeJsonFile = async (filepath, filename, content) => {
     validateFilePathAndName(filepath, filename);
     if (!content) throw new Error("El contenido no fue proporcionado.");
     try {
-        await fs.promises.writeFile(path.join(filepath, filename), JSON.stringify(content, null, "\t"), "utf8");
+        await fs.promises.writeFile(path.join(filepath, filename), content);
     } catch (error) {
         throw new Error(`Error al leer el archivo ${filename}`);
         

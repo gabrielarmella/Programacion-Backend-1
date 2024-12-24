@@ -9,7 +9,6 @@ const productSchema = new Schema({
         trim: true,
         minLength: [ 3, "El nombre debe tener al menos 3 caracteres" ],
         maxLength: [ 25, "El nombre debe tener como máximo 25 caracteres" ],
-        index: { name: "idx_title" },
     },
     description: {
         type: String,
@@ -30,16 +29,19 @@ const productSchema = new Schema({
     code: {
         type: String,
         required: [ true, "El codigo del producto es obligatorio" ],
+        lowercase: true,
         trim: true,
-        minLength: [ 2, "El codigo debe tener al menos dos caracteres" ],
-        maxLength: [ 10, "El codigo debe tener maximo diez caracteres" ],
-    },
-    code: {
-        type: String,
-        required: [ true, "El codigo del producto es obligatorio" ],
-        trim: true,
-        minLength: [ 2, "El codigo debe tener al menos dos caracteres" ],
-        maxLength: [ 10, "El codigo debe tener maximo diez caracteres" ],
+        unique: true,
+        validate: {
+            validator: async function (code) {
+                const countDocuments = await this.model("products").countDocuments({
+                    _id:{ $ne: this._id },
+                    code,
+                });
+                return countDocuments===0;
+            },
+            message: "El código ya está registrado",
+        },
     },
     stock: {
         type: Number,
@@ -53,11 +55,9 @@ const productSchema = new Schema({
     category: {
         type: String,
         required: [ true, "La categoria del producto es obligatorio" ],
-        uppercase: true,
         trim: true,
-        minLength: [ 3, "La categoria debe tener al menos 3 caracteres" ],
-        maxLength: [ 25, "La categoria debe tener como máximo 25 caracteres" ],
-        index: { name: "idx_category" },
+        minLength: [ 3, "La categoría debe tener al menos 3 caracteres" ],
+        maxLength: [ 15, "La categoría debe tener como máximo 15 caracteres" ],
     },
 }, {
     timestamps: true, 

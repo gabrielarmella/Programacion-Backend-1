@@ -1,15 +1,70 @@
-<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalles del Producto</title>
-    <link rel="stylesheet" href="/api/public/css/main.css">
-</head>
-<body>
-    <h1>Bienvenido a la tienda</h1>
-    <a href="/products">Ver productos</a>
-    <a href="/carts">Ver Carrito</a>
+    <header>
+    <a href="http://localhost:8080"><h1>Retro <span><img src="api/public/images/logo.png" class="logo"></span>Electronica</h1></a>
+    </header>
+<main>
+    <section>
+        <h3>Productos</h3>
+        <div>
+            <div>
+                <h5>Ordenar por</h5>
+                <button id="title-asc">A-Z Ascendente</button>
+                <button id="title-desc">Z-A Descendente</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="products-list"></tbody>
+            </table>
+        </div>
+        <div class="pages-div">
+            <button id="prev-page" class="btn-reset"><span >◀️</span></button>
+            <span class="pagination" id="pagination-info"></span>
+            <button id="next-page" class="btn-reset"><span >▶️</span></button>
+        </div>
+    </section>
+
+    <section>
+        <h3>Carrito</h3>
+        <button onclick="window.location.href='/cart/6769a5c0e7ea2d2c8e36f909'">Ir al carrito</button>
+        <button id="btn-delete-cart" data-cart-id="{{cart._id}}">Vaciar Carrito</button>
+    </section>
+
+    <section>
+        <h3>Agregar Productos</h3>
+        <form class="form" id="products-form" enctype="multipart/form-data" method="POST" action="/api/products">
+            <div>
+                <input type="text" name="title" placeholder="Nombre">
+                <input type="text" name="category" placeholder="Categoría">
+                <input type="text" name="description" placeholder="Descripción">
+            </div>
+            <div>
+                <input type="text" name="code" placeholder="Código">
+                <input type="number" name="price" placeholder="Precio">
+                <input type="number" name="stock" placeholder="Stock">
+            </div>
+            <div>Activo <input type="checkbox" name="status"></div>
+            <input type="file" name="file" placeholder="Imagen">
+
+            <input type="submit" value="Guardar">
+        </form>
+    </section>
+
+    <section>
+        <h3>Eliminar Productos</h3>
+        <div class="products__delete">
+            <input type="text" class="products__delete__input" id="input-product-id" placeholder="ID del Producto">
+            <button id="btn-delete-product">Eliminar</button>
+        </div>
+    </section>
+
+    <p class="error-message" id="error-message"></p>
+</main>
+<script src="/socket.io/socket.io.js"></script>
 <script src="/api/public/js/products.socket.js"></script> 
-</body>
-</html>

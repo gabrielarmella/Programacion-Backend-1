@@ -1,15 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carrito</title>
-    <link rel="stylesheet" href="/api/public/css/main.css">
-</head>
-<body>
-    <h1>Carrito</h1>
-    <ul id="cart-products-list"></ul>
-    <a href="/products">Volver a la lista de productos</a>
-    <script src="/api/public/js/cart.js"></script>
-</body>
-</html>
+    <header>
+    <a href="http://localhost:8080"><h1>Retro <span><img src="/api/public/images/logo.png" class="logo"></span>Electronica</h1></a>
+    </header>
+<main>
+    <section>
+        <h3>Detalles del Carrito</h3>
+        <div id="cart-details"></div>
+        <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Controles</th>
+                    </tr>
+                </thead>
+                <tbody id="cart-items"></tbody>
+            </table>
+            <button id="btn-delete-cart" data-cart-id="{{cart._id}}">Vaciar Carrito</button>
+        <button onclick="window.history.back()">Volver</button>
+    </section>
+
+    <p class="error-message" id="error-message"></p>
+</main>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/api/public/js/carts.socket.js"></script>

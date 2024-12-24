@@ -26,40 +26,42 @@ export default class ProductManager {
     }
 
     // Obtiene una lista de productos
-    async getAll(params){
+    async getAll(params) {
         try {
-            const filters = {};
-            
-            if (params?.category) {
-                filters.category = params.category;
+            const $and = [];
+    
+            if (params?.title) {
+                $and.push({ title: { $regex: params.title, $options: "i" } });
             }
-            
-            if (params?.search) {
-                filters.$or = [
-                    { title: { $regex: params.search, $options: 'i' }},
-                    { description: { $regex: params.search, $options: 'i' }}
-                ];
-            }
-            const paginationOptions = {
-                page: params?.page || 1, 
-                limit: params?.limit || 10, 
-                sort: params?.sort ? { [params.sort]: params?.order === 'desc' ? -1 : 1 } : { createdAt: -1 },
-                lean: true, 
+    
+            const filters = $and.length > 0 ? { $and } : {};
+    
+            const sort = {
+                asc: { title: 1 },
+                desc: { title: -1 },
             };
-
-            return await this.#productModel.paginate(filters, paginationOptions);
+    
+            const paginationOptions = {
+                limit: params?.limit || 10,
+                page: params?.page || 1,
+                sort: sort[params?.sort] ?? {},
+                lean: true,
+            };
+    
+            const result = await this.#productModel.paginate(filters, paginationOptions);
+            result.docs = result.docs || [];
+            return result;
         } catch (error) {
-            throw new ErrorManager(`Error al obtener productos: ${error.message}`, 500);
+            throw ErrorManager.handleError(error);
         }
     }
 
     // Obtiene un producto específico por su ID
     async getOneById(id) {
         try {
-            const productFound = await this.#findOneById(id);
-            return productFound;
+            return await this.#findOneById(id);
         } catch (error) {
-            throw new ErrorManager(error.message, error.code);
+            throw new ErrorManager(error);
         }
     }
 
@@ -106,15 +108,5 @@ export default class ProductManager {
         } catch (error) {
             throw ErrorManager.handleError(error);
         }
-    }
-
-    async getProducts() {
-        // Aquí deberías implementar la lógica para obtener los productos de la base de datos
-        // Por ejemplo:
-        // return await ProductModel.find();
-        return [
-            { id: 1, name: 'Producto 1', price: 100 },
-            { id: 2, name: 'Producto 2', price: 200 },
-        ];
     }
 }

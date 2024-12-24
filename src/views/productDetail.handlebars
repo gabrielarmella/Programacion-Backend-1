@@ -1,0 +1,17 @@
+    <header>
+    <a href="http://localhost:8080"><h1>Retro <span><img src="/api/public/images/logo.png" class="logo"></span>Electronica</h1></a>
+    </header>
+<main>
+    <div class="product-detail">
+
+        <h4><strong>Precio:</strong> ${{product.price}}</h4>
+        <p class="description-product">Descripción: {{product.description}}</p>
+        <h5>Código: {{product.code}}</h5>
+        <img src="/api/public/images/{{product.thumbnail}}" alt="{{product.title}}">
+        <div class="product-detail__buttons">
+            <button href="http://localhost:8080/api/carts">Agregar al carrito</button> 
+            <button onclick="window.history.back()">Volver</button>    
+        </div>
+    </div>
+
+</main>
