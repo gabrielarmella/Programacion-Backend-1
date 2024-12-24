@@ -61,7 +61,7 @@ export default class CartManager {
 
 
     // Agrega un producto a un carrito o incrementa la cantidad de un producto existente
-    addOneProduct = async (id, productId) => {
+    async addOneProduct(id, productId) {
         try {
             const cart = await this.#findOneById(id);
             const productIndex = cart.products.findIndex((item) => item.product._id.toString() === productId);
@@ -136,17 +136,6 @@ async deleteAllProductsByProductId(id, productId) {
     }
 }
 
-// Actualiza un carrito con un arreglo de productos
-async updateCart(id, products) {
-    try {
-        const cart = await this.#findOneById(id);
-        cart.products = products;
-        await cart.save();
-        return cart;
-    } catch (error) {
-        throw new ErrorManager(error.message, error.code);
-    }
-} 
 //Elimina todos los productos del carrito
 async removeAllProductsById(id) {
     try {

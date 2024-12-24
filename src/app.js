@@ -4,7 +4,7 @@ import { config as configHandlebars } from "./config/handlebars.config.js";
 import { config as configWebsocket } from "./config/websocket.config.js";
 //Importacion de enrutadores
 import routerCarts from "./routes/cart.router.js";
-import routerProducts from "./routes/product.router.js";
+import routerProducts from "./routes/products.router.js";
 import routerViewHome from "./routes/home.view.router.js";
 
 // Se crea una instancia de la aplicación Express

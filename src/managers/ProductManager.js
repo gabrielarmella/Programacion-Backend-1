@@ -37,8 +37,8 @@ export default class ProductManager {
             const filters = $and.length > 0 ? { $and } : {};
     
             const sort = {
-                asc: { title: 1 },
-                desc: { title: -1 },
+                asc: { [params?.sortField || "title"]: 1 },
+                desc: { [params?.sortField || "title"]: -1 },
             };
     
             const paginationOptions = {
@@ -66,11 +66,12 @@ export default class ProductManager {
     }
 
     // Inserta un producto
-    async insertOne(data) {
+    async insertOne(data, filename) {
         try {
             const product = await this.#productModel.create({
                 ...data,
                 status: convertToBoolean(data.status),
+                thumbnail: filename ?? "image-not-found.png",
             });
 
             return product;
@@ -91,7 +92,7 @@ export default class ProductManager {
             };
 
             product.set(newValues);
-            product.save();
+            await product.save();
 
             return product;
         } catch (error) {

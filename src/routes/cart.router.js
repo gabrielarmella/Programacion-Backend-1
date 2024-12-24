@@ -1,5 +1,6 @@
 import { Router } from "express";
 import CartManager from "../managers/CartManager.js";
+import ErrorManager from "../managers/ErrorManager.js";
 
 
 const router = Router();
@@ -31,7 +32,7 @@ router.post("/", async (req, res) => {
         const cart = await cartManager.insertOne(req.body);
         res.status(201).json({ status: "success", payload: cart });
     } catch (error) {
-        res.status(error.code).json({ status: "error", message: error.message });
+        res.status(error.code || 500).json({ status: "error", message: error.message });
     }
 });
 
@@ -50,9 +51,9 @@ router.put("/:cid/products/:pid", async (req, res) => {
 router.delete("/:id", async (req, res) => {
     try {
         const cartDeleted = await cartManager.deleteOneById(req.params.id);
-        res.status(200).json({ status: true, payload: cartDeleted });
+        res.status(200).json({ status: "success", payload: cartDeleted });
     } catch (error) {
-        errorHandler(res, error.message);
+       res.status(error.code || 500).json({ status: "error", message: error.message });
     }
 });
 
@@ -61,9 +62,9 @@ router.delete("/:id/products/:pid", async (req, res) => {
     try {
         const { id, pid: productId } = req.params;
         const cartDeleted = await cartManager.deleteOneProduct(id, productId);
-        res.status(200).json({ status: true, payload: cartDeleted });
+        res.status(200).json({ status: "success", payload: cartDeleted });
     } catch (error) {
-        errorHandler(res, error.message);
+        res.status(error.code || 500).json({ status: "error", message: error.message });
     }
 });
 

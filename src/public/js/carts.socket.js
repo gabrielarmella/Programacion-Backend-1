@@ -30,19 +30,20 @@ socket.on("cart-updated", (data) => {
     cartItems.innerHTML = "";
     products.forEach((product) => {
         cartItems.innerHTML += `<tr>
-        <td> ${product._id} </td>
-        <td>  ${product.title} </td>
+        <td> ${product.product._id} </td>
+        <td>  ${product.product.title} </td>
         <td> ${product.quantity} </td>
-        <td> $ ${product.price} </td>
+        <td> $ ${product.product.price} </td>
         <td>
-            <button class="add-to-cart" data-product-id="${product._id}">+</button>
-            <button class="remove-from-cart" data-product-id="${product._id}">-</button>
-            <button class="delete-all-from-cart" data-product-id="${product._id}">Quitar Todos</button>
+            <button class="add-to-cart" data-product-id="${product.product._id}">+</button>
+            <button class="remove-from-cart" data-product-id="${product.product._id}">-</button>
+            <button class="delete-all-from-cart" data-product-id="${product.product._id}">Quitar Todos</button>
         </td>
         </tr>
         `;
     });
 });
+
 btnDeleteCart.onclick = (event)=>{
     if (event.target && event.target.id === "btn-delete-cart") {
         const cartId = event.target.dataset.cartId;

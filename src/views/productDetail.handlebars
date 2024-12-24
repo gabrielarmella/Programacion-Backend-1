@@ -9,9 +9,12 @@
         <h5>Código: {{product.code}}</h5>
         <img src="/api/public/images/{{product.thumbnail}}" alt="{{product.title}}">
         <div class="product-detail__buttons">
-            <button href="http://localhost:8080/api/carts">Agregar al carrito</button> 
+            <button id="add-to-cart" data-product-id="{{product.id}}">Agregar al carrito</button> 
             <button onclick="window.history.back()">Volver</button>    
         </div>
     </div>
 
 </main>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/api/public/js/products.socket.js"></script> 
+ 

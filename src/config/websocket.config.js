@@ -27,30 +27,30 @@ export const config = (httpServer) => {
 
         socket.emit("cart-updated", { cart: await cartManager.getOneById(cartId) });
 
-        const emitPaginatedProducts = async (page = 1, sort = "asc") => {
-            const products = await productManager.getAll({ page, sort });
+        const emitPaginatedProducts = async (page = 1, sort = "asc", sortField = "title") => {
+            const products = await productManager.getAll({ page, sort, sortField });
             socketServer.emit("products-list", { ...products, cartId });
         };
 
-
+ 
         await emitPaginatedProducts();
 
         socket.on("change-sort", async (data) => {
-            const { sort } = data;
-            await emitPaginatedProducts(1, sort);
+            const { sort, sortField } = data;
+            await emitPaginatedProducts(1, sort, sortField);
         });
 
         socket.on("change-page", async (data) => {
-            const { page, sort } = data;
-            await emitPaginatedProducts(page, sort);
+            const { page, sort, sortField } = data;
+            await emitPaginatedProducts(page, sort, sortField);
         });
 
 
         socket.on("add-to-cart", async ({ productId }) => {
             try {
-                const cartId = await cartManager.getOneById();
-                await cartManager.addProductToCart(cartId, productId);
-                socket.emit("cart-updated");
+                await cartManager.addOneProduct(cartId, productId);
+                const updatedCart = await cartManager.getOneById(cartId);
+                socket.emit("cart-updated", { cart: updatedCart });
             } catch (error) {
                 socket.emit("error-message", { message: error.message });
             }

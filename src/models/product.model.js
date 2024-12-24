@@ -22,9 +22,12 @@ const productSchema = new Schema({
         required: [ true, "El precio del producto es obligatorio" ],
         min: [ 0, "El precio debe ser un valor positivo" ],
     },
-    thumbnail: {
+    category: {
         type: String,
-        required: [ true, "La imagen del producto es obligatoria" ],
+        required: [ true, "La categoria del producto es obligatorio" ],
+        trim: true,
+        minLength: [ 3, "La categoría debe tener al menos 3 caracteres" ],
+        maxLength: [ 15, "La categoría debe tener como máximo 15 caracteres" ],
     },
     code: {
         type: String,
@@ -52,12 +55,9 @@ const productSchema = new Schema({
         type: Boolean,
         required: [ true, "El estado es obligatorio" ],
     },
-    category: {
+    thumbnail: {
         type: String,
-        required: [ true, "La categoria del producto es obligatorio" ],
-        trim: true,
-        minLength: [ 3, "La categoría debe tener al menos 3 caracteres" ],
-        maxLength: [ 15, "La categoría debe tener como máximo 15 caracteres" ],
+        required: [ true, "La imagen del producto es obligatoria" ],
     },
 }, {
     timestamps: true, 

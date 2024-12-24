@@ -8,8 +8,17 @@
         <div>
             <div>
                 <h5>Ordenar por</h5>
-                <button id="title-asc">A-Z Ascendente</button>
-                <button id="title-desc">Z-A Descendente</button>
+                <div class="dropdown">
+                    <button class="dropbtn">Ordenar por</button>
+                    <div class="dropdown-content">
+                        <a href="#" id="title-asc">A-Nombre</a>
+                        <a href="#" id="title-desc">Z-Nombre</a>
+                        <a href="#" id="category-asc">A-Categoría Ascendente</a>
+                        <a href="#" id="category-desc">Z-Categoría Descendente</a>
+                        <a href="#" id="price-asc">Mayor Precio</a>
+                        <a href="#" id="price-desc">Menor Precio</a>
+                    </div>
+                </div>
             </div>
             <table>
                 <thead>
@@ -17,6 +26,7 @@
                         <th>ID</th>
                         <th>Nombre</th>
                         <th>Precio</th>
+                        <th>Categoría</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -50,9 +60,8 @@
                 <input type="number" name="stock" placeholder="Stock">
             </div>
             <div>Activo <input type="checkbox" name="status"></div>
-            <input type="file" name="file" placeholder="Imagen">
-
-            <input type="submit" value="Guardar">
+            <input type="file" name="thumbnail" >
+            <button type="submit" value="Guardar">Agregar Producto</button>
         </form>
     </section>
 
@@ -68,3 +77,4 @@
 </main>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/api/public/js/products.socket.js"></script> 
+ 

@@ -11,6 +11,7 @@ const btnDeleteCart = document.getElementById("btn-delete-cart");
 
 let currentPage = 1;
 let currentSort = "asc";
+let currentSortField = "title"; 
 let globalCartId;
 
 socket.on("products-list", (data) => {
@@ -29,6 +30,7 @@ socket.on("products-list", (data) => {
             <td> ${product.id} </td>
             <td> ${product.title} </td>
             <td> ${product.price} </td>
+            <td> ${product.category} </td>
             <td>
                 <button class="btn-reset btn info" onclick="window.location.href='/product/${product._id}'"><span><img src="api/public/images/btn-info.png"></button>
                 <button class="add-to-cart"  data-product-id="${product.id}">+</button>
@@ -46,7 +48,7 @@ socket.on("products-list", (data) => {
 document.getElementById("prev-page").addEventListener("click", () => {
     if (currentPage > 1) {
         currentPage--;
-        socket.emit("change-page", { page: currentPage, sort: currentSort });
+        socket.emit("change-page", { page: currentPage, sort: currentSort, sortField: currentSortField });
     }
 });
 
@@ -54,20 +56,50 @@ document.getElementById("next-page").addEventListener("click", () => {
     const totalPages = parseInt(document.getElementById("pagination-info").dataset.totalPages, 10);
     if (currentPage < totalPages) {
         currentPage++;
-        socket.emit("change-page", { page: currentPage, sort: currentSort });
+        socket.emit("change-page", {page: currentPage, sort: currentSort, sortField: currentSortField});
     }
 });
 
 document.getElementById("title-asc").addEventListener("click", () => {
     currentSort = "asc";
+    currentSortField = "title";
     currentPage = 1;
-    socket.emit("change-page", { page: currentPage, sort: currentSort });
+    socket.emit("change-page", {page: currentPage, sort: currentSort, sortField: currentSortField });
 });
 
 document.getElementById("title-desc").addEventListener("click", () => {
     currentSort = "desc";
+    currentSortField = "title";
     currentPage = 1;
-    socket.emit("change-page", { page: currentPage, sort: currentSort });
+    socket.emit("change-page", { page: currentPage, sort: currentSort, sortField: currentSortField});
+});
+
+document.getElementById("category-asc").addEventListener("click", () => {
+    currentSort = "asc";
+    currentSortField = "category";
+    currentPage = 1;
+    socket.emit("change-page", { page: currentPage, sort: currentSort, sortField: currentSortField });
+});
+
+document.getElementById("category-desc").addEventListener("click", () => {
+    currentSort = "desc";
+    currentSortField = "category";
+    currentPage = 1;
+    socket.emit("change-page", { page: currentPage, sort: currentSort, sortField: currentSortField });
+});
+
+document.getElementById("price-asc").addEventListener("click", () => {
+    currentSort = "asc";
+    currentSortField = "price";
+    currentPage = 1;
+    socket.emit("change-page", { page: currentPage, sort: currentSort, sortField: currentSortField });
+});
+
+document.getElementById("price-desc").addEventListener("click", () => {
+    currentSort = "desc";
+    currentSortField = "price";
+    currentPage = 1;
+    socket.emit("change-page", { page: currentPage, sort: currentSort, sortField: currentSortField });
 });
 
 document.body.addEventListener("click", (event) => {
@@ -98,7 +130,7 @@ productsForm.onsubmit = (event) => {
     event.preventDefault();
     const form = event.target;
     const formData = new FormData(form);
-    const file = formData.get("file");
+    const file = formData.get("thumbnail");
     errorMessage.innerText = "";
 
     socket.emit("insert-product", {

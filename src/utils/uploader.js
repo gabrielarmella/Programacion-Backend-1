@@ -13,6 +13,21 @@ const storage = multer.diskStorage({
     },
 });
 
-const uploader = multer({ storage });
+const fileFilter = (req, file, callback) => {
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/jpg", "image/webp"];
+    if (!allowedTypes.includes(file.mimetype)) {
+        const error = new Error("Tipo de archivo no permitido");
+        error.code = "LIMIT_FILE_TYPES";
+        return callback(error, false);
+    }
+    callback(null, true);
+};
+
+const uploader = multer({ 
+    storage, 
+    fileFilter,
+    limits: { fileSize: 5000000 } // Limitar el tamaño del archivo a 5MB
+
+ });
 
 export default uploader;
